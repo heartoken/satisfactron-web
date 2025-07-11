@@ -1,0 +1,16 @@
+module default {
+
+  type Device {
+    name -> str;
+    votes := .<device[is Vote];
+  }
+
+  type Vote {
+    required property value -> int16 {
+      constraint min_value(1);
+      constraint max_value(5);
+    };
+    required link device -> Device;
+  }
+
+}
