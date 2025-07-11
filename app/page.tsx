@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Star, TrendingUp, Vote } from "lucide-react"
+import { CreateDeviceForm } from "@/components/create-device-form"
 
 async function getDevicesStats() {
   const baseUrl = process.env.VERCEL_URL 
@@ -25,8 +26,13 @@ export default async function Dashboard() {
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Voting Dashboard</h1>
-        <p className="text-muted-foreground">Monitor voting activity across all devices</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Voting Dashboard</h1>
+            <p className="text-muted-foreground">Monitor voting activity across all devices</p>
+          </div>
+          <CreateDeviceForm />
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

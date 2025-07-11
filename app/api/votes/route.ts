@@ -53,9 +53,24 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { deviceId, voteValue } = body
+    const { deviceId, voteValue, deviceName, action } = body
 
-    // Validation
+    if (action === 'createDevice') {
+      // Create device
+      if (!deviceName || typeof deviceName !== "string") {
+        return NextResponse.json({ error: "deviceName is required and must be a string" }, { status: 400 })
+      }
+
+      const result = await client.querySingle(`
+        insert Device {
+          name := <str>$deviceName
+        };
+      `, { deviceName })
+
+      return NextResponse.json(result, { status: 201 })
+    }
+
+    // Create vote (existing logic)
     if (!deviceId || typeof deviceId !== "string") {
       return NextResponse.json({ error: "deviceId is required and must be a string" }, { status: 400 })
     }
@@ -77,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result, { status: 201 })
   } catch (error) {
-    console.error("Error creating vote:", error)
+    console.error("Error creating vote or device:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
