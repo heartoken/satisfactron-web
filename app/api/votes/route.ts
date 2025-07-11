@@ -100,3 +100,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const deviceId = searchParams.get('deviceId')
+
+    if (!deviceId) {
+      return NextResponse.json({ error: "deviceId is required" }, { status: 400 })
+    }
+
+    // Delete device (votes will be automatically deleted due to cascade)
+    await client.query(`
+      delete Device filter .id = <uuid>$deviceId;
+    `, { deviceId })
+
+    return NextResponse.json({ message: "Device deleted successfully" }, { status: 200 })
+  } catch (error) {
+    console.error("Error deleting device:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}

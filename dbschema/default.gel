@@ -10,7 +10,9 @@ module default {
       constraint min_value(1);
       constraint max_value(5);
     };
-    required link device -> Device;
+    required link device -> Device {
+      on target delete delete source;
+    };
   }
 
 }

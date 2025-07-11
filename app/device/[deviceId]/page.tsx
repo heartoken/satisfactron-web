@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Calendar, Star, TrendingUp, Vote } from "lucide-react"
+import { DeleteDeviceButton } from "@/components/delete-device-button"
 
 interface DevicePageProps {
   params: {
@@ -60,10 +61,18 @@ export default async function DevicePage({ params }: DevicePageProps) {
             <h1 className="text-3xl font-bold mb-2">{stats.name}</h1>
             <p className="text-muted-foreground">Detailed voting statistics and history</p>
           </div>
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            <Vote className="w-4 h-4 mr-2" />
-            {stats.votes.length} total votes
-          </Badge>
+          <div className="flex items-center space-x-3">
+            <Badge variant="outline" className="text-lg px-4 py-2">
+              <Vote className="w-4 h-4 mr-2" />
+              {stats.votes.length} total votes
+            </Badge>
+            <DeleteDeviceButton 
+              deviceId={stats.id} 
+              deviceName={stats.name} 
+              voteCount={stats.votes.length} 
+              redirectAfterDelete={true}
+            />
+          </div>
         </div>
       </div>
 
