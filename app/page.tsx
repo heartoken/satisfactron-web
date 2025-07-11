@@ -6,13 +6,25 @@ import { CreateDeviceForm } from "@/components/create-device-form"
 
 import { createClient } from 'gel'
 
+type Device = {
+  id: string
+  name: string
+  votes: Vote[]
+}
+
+type Vote = {
+  id: string
+  value: number
+  device: Device
+}
+
 const client = createClient({
   instance: process.env.GEL_INSTANCE,
   branch: process.env.GEL_BRANCH,
   secretKey: process.env.GEL_SECRET_KEY,
 })
 
-async function getDevicesStats() {
+async function getDevicesStats(): Promise<Device[]> {
   try {
     const result = await client.query(`
       select Device {
@@ -26,7 +38,7 @@ async function getDevicesStats() {
       };
     `)
     
-    return result || []
+    return (result as Device[]) || []
   } catch (error) {
     console.error('Failed to fetch devices:', error)
     return []
@@ -49,10 +61,10 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {devicesStats.map((device) => {
+        {devicesStats.map((device: Device) => {
           const totalVotes = device.votes.length;
           const averageVote = totalVotes > 0 
-            ? Math.round((device.votes.reduce((sum, vote) => sum + vote.value, 0) / totalVotes) * 100) / 100
+            ? Math.round((device.votes.reduce((sum: number, vote: Vote) => sum + vote.value, 0) / totalVotes) * 100) / 100
             : 0;
           
           return (
