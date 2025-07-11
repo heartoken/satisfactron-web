@@ -42,10 +42,14 @@ export async function GET(request: NextRequest) {
         };
       `)
 
-      return NextResponse.json(result)
+      return NextResponse.json(result || [])
     }
   } catch (error) {
     console.error("Error fetching data:", error)
+    // Return empty array for GET requests instead of error
+    if (request.method === 'GET') {
+      return NextResponse.json([])
+    }
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

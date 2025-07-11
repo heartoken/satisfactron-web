@@ -9,15 +9,22 @@ async function getDevicesStats() {
     ? `https://${process.env.VERCEL_URL}` 
     : 'http://localhost:3000'
     
-  const response = await fetch(`${baseUrl}/api/votes`, {
-    cache: 'no-store'
-  })
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch devices')
+  try {
+    const response = await fetch(`${baseUrl}/api/votes`, {
+      cache: 'no-store'
+    })
+    
+    if (!response.ok) {
+      console.error('API response not ok:', response.status, response.statusText)
+      return []
+    }
+    
+    const data = await response.json()
+    return data || []
+  } catch (error) {
+    console.error('Failed to fetch devices:', error)
+    return []
   }
-  
-  return response.json()
 }
 
 export default async function Dashboard() {
