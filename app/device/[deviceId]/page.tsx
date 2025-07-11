@@ -12,20 +12,41 @@ interface DevicePageProps {
   }
 }
 
-async function getDeviceStats(deviceId: string) {
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : 'http://localhost:3000'
-    
-  const response = await fetch(`${baseUrl}/api/votes?deviceId=${deviceId}`, {
-    cache: 'no-store'
-  })
-  
-  if (!response.ok) {
+import { createClient } from 'gel'
+
+type Device = {
+  id: string
+  name: string
+  votes: Vote[]
+}
+
+type Vote = {
+  id: string
+  value: number
+  device: Device
+}
+
+const client = createClient()
+
+async function getDeviceStats(deviceId: string): Promise<Device | null> {
+  try {
+    const result = await client.query(`
+      select Device {
+        id,
+        name,
+        votes: {
+          id,
+          value,
+          device: { id, name }
+        }
+      } filter .id = <uuid>$deviceId;
+    `, { deviceId })
+
+    return (result as Device[])[0] || null
+  } catch (error) {
+    console.error('Failed to fetch device:', error)
     return null
   }
-  
-  return response.json()
 }
 
 export default async function DevicePage({ params }: DevicePageProps) {
@@ -36,9 +57,6 @@ export default async function DevicePage({ params }: DevicePageProps) {
     notFound()
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString()
-  }
 
   const getVoteColor = (value: number) => {
     if (value >= 4) return "bg-green-500"
@@ -88,7 +106,7 @@ export default async function DevicePage({ params }: DevicePageProps) {
           <CardContent>
             <div className="text-3xl font-bold">
               {stats.votes.length > 0 
-                ? Math.round((stats.votes.reduce((sum, vote) => sum + vote.value, 0) / stats.votes.length) * 100) / 100
+                ? Math.round((stats.votes.reduce((sum: number, vote: Vote) => sum + vote.value, 0) / stats.votes.length) * 100) / 100
                 : 0}
             </div>
             <p className="text-sm text-muted-foreground">out of 5.0</p>
@@ -132,7 +150,7 @@ export default async function DevicePage({ params }: DevicePageProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {stats.votes.map((vote) => (
+            {stats.votes.map((vote: Vote) => (
               <div key={vote.id} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center space-x-4">
                   <div

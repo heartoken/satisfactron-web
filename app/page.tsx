@@ -4,23 +4,29 @@ import { Badge } from "@/components/ui/badge"
 import { Star, TrendingUp, Vote } from "lucide-react"
 import { CreateDeviceForm } from "@/components/create-device-form"
 
+import { createClient } from 'gel'
+
+const client = createClient({
+  instance: process.env.GEL_INSTANCE,
+  branch: process.env.GEL_BRANCH,
+  secretKey: process.env.GEL_SECRET_KEY,
+})
+
 async function getDevicesStats() {
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : 'http://localhost:3000'
-    
   try {
-    const response = await fetch(`${baseUrl}/api/votes`, {
-      cache: 'no-store'
-    })
+    const result = await client.query(`
+      select Device {
+        id,
+        name,
+        votes: {
+          id,
+          value,
+          device: { id, name }
+        }
+      };
+    `)
     
-    if (!response.ok) {
-      console.error('API response not ok:', response.status, response.statusText)
-      return []
-    }
-    
-    const data = await response.json()
-    return data || []
+    return result || []
   } catch (error) {
     console.error('Failed to fetch devices:', error)
     return []

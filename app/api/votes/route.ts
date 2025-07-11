@@ -1,7 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from 'gel'
 
-const client = createClient()
+const client = createClient({
+  instance: process.env.GEL_INSTANCE,
+  branch: process.env.GEL_BRANCH,
+  secretKey: process.env.GEL_SECRET_KEY,
+})
 
 export async function GET(request: NextRequest) {
   try {
