@@ -12,7 +12,11 @@ interface DevicePageProps {
 }
 
 async function getDeviceStats(deviceId: string) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/votes?deviceId=${deviceId}`, {
+  const baseUrl = process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : 'http://localhost:3000'
+    
+  const response = await fetch(`${baseUrl}/api/votes?deviceId=${deviceId}`, {
     cache: 'no-store'
   })
   
