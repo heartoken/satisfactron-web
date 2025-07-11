@@ -68,7 +68,7 @@ export default async function Dashboard() {
             : 0;
           
           return (
-            <Link key={device.name} href={`/device/${device.id}`}>
+            <Link key={device.id} href={`/device/${device.id}`}>
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
