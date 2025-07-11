@@ -49,6 +49,10 @@ async function getDeviceStats(deviceId: string): Promise<Device | null> {
   }
 }
 
+// Disable caching for this page
+export const revalidate = 0
+export const dynamic = 'force-dynamic'
+
 export default async function DevicePage({ params }: DevicePageProps) {
   const { deviceId } = params
   const stats = await getDeviceStats(deviceId)

@@ -45,6 +45,10 @@ async function getDevicesStats(): Promise<Device[]> {
   }
 }
 
+// Disable caching for this page
+export const revalidate = 0
+export const dynamic = 'force-dynamic'
+
 export default async function Dashboard() {
   const devicesStats = await getDevicesStats()
 
