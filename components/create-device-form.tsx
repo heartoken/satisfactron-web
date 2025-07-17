@@ -19,11 +19,7 @@ export function CreateDeviceForm() {
 
     setIsLoading(true)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL 
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` 
-        : 'http://localhost:3000'
-        
-      const response = await fetch(`${baseUrl}/api/votes`, {
+      const response = await fetch('/api/votes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

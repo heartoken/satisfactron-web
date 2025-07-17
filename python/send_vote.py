@@ -3,7 +3,7 @@ import requests
 
 # Change this URL to your app
 BASE_URL = "https://satisfaction-omega.vercel.app/"
-# BASE_URL = "http://localhost:3000"  # For local development
+# BASE_URL = "http://localhost:3001"  # For local development
 
 def send_vote(device_id, vote_value):
     """Send a vote to the API"""
@@ -41,7 +41,8 @@ def create_device(name):
 # Example usage
 if __name__ == "__main__":
     # Create a test device
-    device_id = create_device("Test Device")
+    # device_id = create_device("Test Device")
+    device_id = 'bb7d4846-6333-11f0-9f7e-1369f2cbf416'
     
     if device_id:
         # Send some votes

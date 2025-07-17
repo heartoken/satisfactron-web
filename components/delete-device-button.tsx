@@ -30,11 +30,7 @@ export function DeleteDeviceButton({ deviceId, deviceName, voteCount, redirectAf
   const handleDelete = async () => {
     setIsLoading(true)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL 
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` 
-        : 'http://localhost:3000'
-        
-      const response = await fetch(`${baseUrl}/api/votes?deviceId=${deviceId}`, {
+      const response = await fetch(`/api/votes?deviceId=${deviceId}`, {
         method: 'DELETE',
       })
 
