@@ -26,7 +26,7 @@ if __name__ == "__main__":
     
     if device_id:
         # Send some votes
-        send_vote(device_id, 5)
-        send_vote(device_id, 4)
-        send_vote(device_id, 3)
+        send_vote(device_id, 1)
+        send_vote(device_id, 1)
+        send_vote(device_id, 1)
         print(f"Check your dashboard: {BASE_URL}")

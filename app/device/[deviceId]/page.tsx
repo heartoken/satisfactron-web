@@ -3,14 +3,19 @@ import { notFound } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, Calendar, Star, TrendingUp, Vote } from "lucide-react"
 import { DeleteDeviceButton } from "@/components/delete-device-button"
+import { DeleteVoteButton } from "@/components/delete-vote-button"
 import { CopyButton } from "@/components/copy-button"
+import { StarRating } from "@/components/star-rating"
+import { DevicePageClient } from "@/components/device-page-client"
+import { DynamicTimeAgo } from "@/components/dynamic-time-ago"
 
 interface DevicePageProps {
-  params: {
+  params: Promise<{
     deviceId: string
-  }
+  }>
 }
 
 import { createClient } from 'gel'
@@ -24,6 +29,7 @@ type Device = {
 type Vote = {
   id: string
   value: number
+  created_at: string
   device: Device
 }
 
@@ -38,6 +44,7 @@ async function getDeviceStats(deviceId: string): Promise<Device | null> {
         votes: {
           id,
           value,
+          created_at,
           device: { id, name }
         }
       } filter .id = <uuid>$deviceId;
@@ -55,7 +62,7 @@ export const revalidate = 0
 export const dynamic = 'force-dynamic'
 
 export default async function DevicePage({ params }: DevicePageProps) {
-  const { deviceId } = params
+  const { deviceId } = await params
   const stats = await getDeviceStats(deviceId)
 
   if (!stats) {
@@ -63,31 +70,25 @@ export default async function DevicePage({ params }: DevicePageProps) {
   }
 
 
-  const getVoteColor = (value: number) => {
-    if (value >= 4) return "bg-green-500"
-    if (value >= 3) return "bg-yellow-500"
-    return "bg-red-500"
-  }
-
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <Link href="/">
-          <Button variant="ghost" className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour au tableau de bord
-          </Button>
-        </Link>
+    <DevicePageClient pollingInterval={1000}>
+      <div className="container mx-auto p-6">
+        <div className="mb-6">
+          <Link href="/">
+            <Button variant="ghost" className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour au tableau de bord
+            </Button>
+          </Link>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{stats.name}</h1>
-            <div className="flex items-center gap-2">
-              <p className="text-muted-foreground">ID: {stats.id}</p>
-              <CopyButton textToCopy={stats.id} />
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">{stats.name}</h1>
+              <div className="flex items-center gap-2">
+                <p className="text-muted-foreground">ID: {stats.id.slice(0, 8)}...</p>
+                <CopyButton textToCopy={stats.id} />
+              </div>
             </div>
-          </div>
-          <div className="flex items-center space-x-3">
             <DeleteDeviceButton 
               deviceId={stats.id} 
               deviceName={stats.name} 
@@ -96,55 +97,61 @@ export default async function DevicePage({ params }: DevicePageProps) {
             />
           </div>
         </div>
-      </div>
 
-      {/* Stats Overview */}
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Star className="w-4 h-4 mr-2 text-yellow-500" />
-              Note moyenne
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {stats.votes.length > 0 
-                ? Math.round((stats.votes.reduce((sum: number, vote: Vote) => sum + vote.value, 0) / stats.votes.length) * 100) / 100
-                : 0}
-            </div>
-            <p className="text-sm text-muted-foreground">sur 5.0</p>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <TrendingUp className="w-4 h-4 mr-2 text-blue-500" />
-              Total des votes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats.votes.length}</div>
-            <p className="text-sm text-muted-foreground">votes collectés</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Calendar className="w-4 h-4 mr-2 text-green-500" />
-              Dernier vote
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-lg font-bold">{stats.votes[0]?.value || "N/A"}</div>
-            <p className="text-sm text-muted-foreground">
-              {stats.votes[0] ? "Vote récent" : "Aucun vote pour le moment"}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Vote Summary */}
+      <Card className="w-full mb-8 relative">
+        <div className="absolute top-4 right-4 flex items-center gap-2 bg-muted px-4 py-2 rounded-full">
+          <StarRating 
+            rating={stats.votes.length > 0 
+              ? stats.votes.reduce((sum: number, vote: Vote) => sum + vote.value, 0) / stats.votes.length
+              : 0} 
+            size="md" 
+          />
+          <span className="text-lg font-semibold text-foreground">
+            {stats.votes.length > 0 
+              ? (stats.votes.reduce((sum: number, vote: Vote) => sum + vote.value, 0) / stats.votes.length).toFixed(1)
+              : '0.0'} sur 5
+          </span>
+        </div>
+        <CardHeader>
+          <CardTitle>Avis des clients</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            Basé sur {stats.votes.length} évaluation{stats.votes.length !== 1 ? 's' : ''} clients
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+            {[5, 4, 3, 2, 1].map((rating) => {
+              const count = stats.votes.filter(vote => vote.value === rating).length
+              const percentage = stats.votes.length > 0 ? (count / stats.votes.length) * 100 : 0
+              
+              return (
+                <div key={rating} className="flex items-center gap-4 text-sm">
+                  <div className="flex shrink-0 gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className="w-4 h-4" 
+                        fill={i < rating ? "#f59e0b" : "none"}
+                        color={i < rating ? "#f59e0b" : "#d1d5db"}
+                        strokeWidth={2}
+                      />
+                    ))}
+                  </div>
+                  <Progress value={percentage} className="h-2 flex-grow" />
+                  <div className="flex items-center gap-1">
+                    <span className="text-muted-foreground">
+                      {percentage.toFixed(0)}%
+                    </span>
+                    <span className="text-muted-foreground">
+                      ({count})
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+        </CardContent>
+      </Card>
 
       {/* Vote History */}
       <Card>
@@ -154,20 +161,17 @@ export default async function DevicePage({ params }: DevicePageProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {stats.votes.map((vote: Vote) => (
+            {stats.votes
+              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+              .map((vote: Vote) => (
               <div key={vote.id} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center space-x-4">
-                  <div
-                    className={`w-8 h-8 rounded-full ${getVoteColor(vote.value)} flex items-center justify-center text-white font-bold`}
-                  >
-                    {vote.value}
-                  </div>
+                  <StarRating rating={vote.value} size="md" />
                   <div>
-                    <p className="font-medium">Vote : {vote.value}/5</p>
-                    <p className="text-sm text-muted-foreground">ID du vote : {vote.id.slice(0, 8)}...</p>
+                    <p className="text-sm text-muted-foreground"><DynamicTimeAgo dateString={vote.created_at} /></p>
                   </div>
                 </div>
-                <Badge variant="outline">{vote.id.slice(0, 8)}...</Badge>
+                <DeleteVoteButton voteId={vote.id} />
               </div>
             ))}
           </div>
@@ -181,6 +185,7 @@ export default async function DevicePage({ params }: DevicePageProps) {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </DevicePageClient>
   )
 }

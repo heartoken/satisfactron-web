@@ -54,7 +54,8 @@ export function DeleteDeviceButton({ deviceId, deviceName, voteCount, redirectAf
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" size="sm">
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-4 h-4 mr-2" />
+          Supprimer l'appareil
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

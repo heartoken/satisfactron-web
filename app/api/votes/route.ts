@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
           votes: {
             id,
             value,
+            created_at,
             device: { id, name }
           }
         } filter .id = <uuid>$deviceId;
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
           votes: {
             id,
             value,
+            created_at,
             device: { id, name }
           }
         };
@@ -105,19 +107,27 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const deviceId = searchParams.get('deviceId')
+    const voteId = searchParams.get('voteId')
 
-    if (!deviceId) {
-      return NextResponse.json({ error: "deviceId is required" }, { status: 400 })
+    if (voteId) {
+      // Delete a specific vote
+      await client.query(`
+        delete Vote filter .id = <uuid>$voteId;
+      `, { voteId })
+
+      return NextResponse.json({ message: "Vote deleted successfully" }, { status: 200 })
+    } else if (deviceId) {
+      // Delete device (votes will be automatically deleted due to cascade)
+      await client.query(`
+        delete Device filter .id = <uuid>$deviceId;
+      `, { deviceId })
+
+      return NextResponse.json({ message: "Device deleted successfully" }, { status: 200 })
+    } else {
+      return NextResponse.json({ error: "deviceId or voteId is required" }, { status: 400 })
     }
-
-    // Delete device (votes will be automatically deleted due to cascade)
-    await client.query(`
-      delete Device filter .id = <uuid>$deviceId;
-    `, { deviceId })
-
-    return NextResponse.json({ message: "Device deleted successfully" }, { status: 200 })
   } catch (error) {
-    console.error("Error deleting device:", error)
+    console.error("Error deleting:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

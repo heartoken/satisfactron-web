@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Star, TrendingUp, Vote } from "lucide-react"
 import { CreateDeviceForm } from "@/components/create-device-form"
+import { StarRating } from "@/components/star-rating"
 
 import { createClient } from 'gel'
 
@@ -15,6 +16,7 @@ type Device = {
 type Vote = {
   id: string
   value: number
+  created_at: string
   device: Device
 }
 
@@ -33,6 +35,7 @@ async function getDevicesStats(): Promise<Device[]> {
         votes: {
           id,
           value,
+          created_at,
           device: { id, name }
         }
       };
@@ -86,13 +89,12 @@ export default async function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span className="text-2xl font-bold">{averageVote}</span>
-                      <span className="text-sm text-muted-foreground">moy</span>
-                    </div>
-                    <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-                      <TrendingUp className="w-4 h-4" />
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xl font-bold">{averageVote}</span>
+                        <span className="text-sm text-muted-foreground">/ 5</span>
+                      </div>
+                      <StarRating rating={averageVote} size="sm" />
                     </div>
                   </div>
                 </CardContent>
