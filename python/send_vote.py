@@ -2,7 +2,7 @@
 import requests
 
 # Change this URL to your app
-BASE_URL = "https://satisfaction-omega.vercel.app/"
+BASE_URL = "https://satisfactron.vercel.app/"
 
 def send_vote(device_id, vote_value):
     """Send a vote to the API"""
