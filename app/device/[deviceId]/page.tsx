@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Calendar, Star, TrendingUp, Vote } from "lucide-react"
 import { DeleteDeviceButton } from "@/components/delete-device-button"
+import { CopyButton } from "@/components/copy-button"
 
 interface DevicePageProps {
   params: {
@@ -74,20 +75,19 @@ export default async function DevicePage({ params }: DevicePageProps) {
         <Link href="/">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            Retour au tableau de bord
           </Button>
         </Link>
 
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">{stats.name}</h1>
-            <p className="text-muted-foreground">Detailed voting statistics and history</p>
+            <div className="flex items-center gap-2">
+              <p className="text-muted-foreground">ID: {stats.id}</p>
+              <CopyButton textToCopy={stats.id} />
+            </div>
           </div>
           <div className="flex items-center space-x-3">
-            <Badge variant="outline" className="text-lg px-4 py-2">
-              <Vote className="w-4 h-4 mr-2" />
-              {stats.votes.length} total votes
-            </Badge>
             <DeleteDeviceButton 
               deviceId={stats.id} 
               deviceName={stats.name} 
@@ -104,7 +104,7 @@ export default async function DevicePage({ params }: DevicePageProps) {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center">
               <Star className="w-4 h-4 mr-2 text-yellow-500" />
-              Average Rating
+              Note moyenne
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -113,7 +113,7 @@ export default async function DevicePage({ params }: DevicePageProps) {
                 ? Math.round((stats.votes.reduce((sum: number, vote: Vote) => sum + vote.value, 0) / stats.votes.length) * 100) / 100
                 : 0}
             </div>
-            <p className="text-sm text-muted-foreground">out of 5.0</p>
+            <p className="text-sm text-muted-foreground">sur 5.0</p>
           </CardContent>
         </Card>
 
@@ -121,12 +121,12 @@ export default async function DevicePage({ params }: DevicePageProps) {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center">
               <TrendingUp className="w-4 h-4 mr-2 text-blue-500" />
-              Total Votes
+              Total des votes
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{stats.votes.length}</div>
-            <p className="text-sm text-muted-foreground">votes collected</p>
+            <p className="text-sm text-muted-foreground">votes collectés</p>
           </CardContent>
         </Card>
 
@@ -134,13 +134,13 @@ export default async function DevicePage({ params }: DevicePageProps) {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center">
               <Calendar className="w-4 h-4 mr-2 text-green-500" />
-              Latest Vote
+              Dernier vote
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-lg font-bold">{stats.votes[0]?.value || "N/A"}</div>
             <p className="text-sm text-muted-foreground">
-              {stats.votes[0] ? "Recent vote" : "No votes yet"}
+              {stats.votes[0] ? "Vote récent" : "Aucun vote pour le moment"}
             </p>
           </CardContent>
         </Card>
@@ -149,8 +149,8 @@ export default async function DevicePage({ params }: DevicePageProps) {
       {/* Vote History */}
       <Card>
         <CardHeader>
-          <CardTitle>Vote History</CardTitle>
-          <CardDescription>Complete history of all votes for this device</CardDescription>
+          <CardTitle>Historique des votes</CardTitle>
+          <CardDescription>Historique complet de tous les votes pour cet appareil</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -163,8 +163,8 @@ export default async function DevicePage({ params }: DevicePageProps) {
                     {vote.value}
                   </div>
                   <div>
-                    <p className="font-medium">Vote: {vote.value}/5</p>
-                    <p className="text-sm text-muted-foreground">Vote ID: {vote.id.slice(0, 8)}...</p>
+                    <p className="font-medium">Vote : {vote.value}/5</p>
+                    <p className="text-sm text-muted-foreground">ID du vote : {vote.id.slice(0, 8)}...</p>
                   </div>
                 </div>
                 <Badge variant="outline">{vote.id.slice(0, 8)}...</Badge>
@@ -175,8 +175,8 @@ export default async function DevicePage({ params }: DevicePageProps) {
           {stats.votes.length === 0 && (
             <div className="text-center py-8">
               <Vote className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No votes recorded</h3>
-              <p className="text-muted-foreground">This device hasn't received any votes yet.</p>
+              <h3 className="text-lg font-semibold mb-2">Aucun vote enregistré</h3>
+              <p className="text-muted-foreground">Cet appareil n'a pas encore reçu de votes.</p>
             </div>
           )}
         </CardContent>

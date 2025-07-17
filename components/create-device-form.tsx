@@ -49,17 +49,17 @@ export function CreateDeviceForm() {
       <DialogTrigger asChild>
         <Button>
           <Plus className="w-4 h-4 mr-2" />
-          Create Device
+          Créer un appareil
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Device</DialogTitle>
+          <DialogTitle>Créer un nouvel appareil</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Input
-              placeholder="Device name"
+              placeholder="Nom de l'appareil"
               value={deviceName}
               onChange={(e) => setDeviceName(e.target.value)}
               disabled={isLoading}
@@ -72,13 +72,13 @@ export function CreateDeviceForm() {
               onClick={() => setOpen(false)}
               disabled={isLoading}
             >
-              Cancel
+              Annuler
             </Button>
             <Button 
               type="submit" 
               disabled={isLoading || !deviceName.trim()}
             >
-              {isLoading ? 'Creating...' : 'Create Device'}
+              {isLoading ? 'Création...' : 'Créer l\'appareil'}
             </Button>
           </div>
         </form>

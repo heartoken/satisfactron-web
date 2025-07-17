@@ -57,8 +57,8 @@ export default async function Dashboard() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Voting Dashboard</h1>
-            <p className="text-muted-foreground">Monitor voting activity across all devices</p>
+            <h1 className="text-3xl font-bold mb-2">Tableau de bord des votes</h1>
+            <p className="text-muted-foreground">Surveillez l'activité de vote sur tous les appareils</p>
           </div>
           <CreateDeviceForm />
         </div>
@@ -82,18 +82,17 @@ export default async function Dashboard() {
                       {totalVotes}
                     </Badge>
                   </div>
-                  <CardDescription>Click to view detailed statistics</CardDescription>
+                  <CardDescription>Cliquez pour voir les statistiques détaillées</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Star className="w-4 h-4 text-yellow-500" />
                       <span className="text-2xl font-bold">{averageVote}</span>
-                      <span className="text-sm text-muted-foreground">avg</span>
+                      <span className="text-sm text-muted-foreground">moy</span>
                     </div>
                     <div className="flex items-center space-x-1 text-sm text-muted-foreground">
                       <TrendingUp className="w-4 h-4" />
-                      <span>{totalVotes} votes</span>
                     </div>
                   </div>
                 </CardContent>
@@ -108,8 +107,8 @@ export default async function Dashboard() {
           <CardContent className="pt-6">
             <div className="text-center">
               <Vote className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No votes yet</h3>
-              <p className="text-muted-foreground">Start collecting votes to see device statistics here.</p>
+              <h3 className="text-lg font-semibold mb-2">Aucun vote pour le moment</h3>
+              <p className="text-muted-foreground">Commencez à collecter des votes pour voir les statistiques des appareils ici.</p>
             </div>
           </CardContent>
         </Card>

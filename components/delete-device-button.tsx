@@ -59,19 +59,19 @@ export function DeleteDeviceButton({ deviceId, deviceName, voteCount, redirectAf
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Device</AlertDialogTitle>
+          <AlertDialogTitle>Supprimer l'appareil</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{deviceName}"? This will permanently delete the device and all {voteCount} votes associated with it. This action cannot be undone.
+            Êtes-vous sûr de vouloir supprimer "{deviceName}" ? Cela supprimera définitivement l'appareil et les {voteCount} votes qui lui sont associés. Cette action ne peut pas être annulée.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>Annuler</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isLoading}
             className="bg-red-600 hover:bg-red-700"
           >
-            {isLoading ? 'Deleting...' : 'Delete Device'}
+            {isLoading ? 'Suppression...' : 'Supprimer l\'appareil'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

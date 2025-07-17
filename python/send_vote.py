@@ -3,7 +3,6 @@ import requests
 
 # Change this URL to your app
 BASE_URL = "https://satisfaction-omega.vercel.app/"
-# BASE_URL = "http://localhost:3001"  # For local development
 
 def send_vote(device_id, vote_value):
     """Send a vote to the API"""
@@ -20,29 +19,10 @@ def send_vote(device_id, vote_value):
     else:
         print(f"❌ Error: {response.status_code} - {response.text}")
 
-def create_device(name):
-    """Create a new device"""
-    url = f"{BASE_URL}/api/votes"
-    data = {
-        "action": "createDevice",
-        "deviceName": name
-    }
-    
-    response = requests.post(url, json=data)
-    
-    if response.status_code == 201:
-        device = response.json()
-        print(f"✅ Device '{name}' created! ID: {device['id']}")
-        return device['id']
-    else:
-        print(f"❌ Error: {response.status_code} - {response.text}")
-        return None
-
 # Example usage
 if __name__ == "__main__":
-    # Create a test device
     # device_id = create_device("Test Device")
-    device_id = 'bb7d4846-6333-11f0-9f7e-1369f2cbf416'
+    device_id = '256d5952-6335-11f0-bda2-bf492b151827'
     
     if device_id:
         # Send some votes
