@@ -12,6 +12,7 @@ import { CopyButton } from "@/components/copy-button"
 import { StarRating } from "@/components/star-rating"
 import { DevicePageClient } from "@/components/device-page-client"
 import { DynamicTimeAgo } from "@/components/dynamic-time-ago"
+import { ChartRatings } from "@/components/chart-ratings"
 
 interface DevicePageProps {
   params: Promise<{
@@ -106,6 +107,11 @@ export default async function DevicePage({ params }: DevicePageProps) {
           </div>
         </div>
 
+
+      {/* Rating Chart */}
+      <div className="mb-8">
+        <ChartRatings votes={stats.votes} />
+      </div>
 
       {/* Vote Summary */}
       <Card className="w-full mb-8 relative">
