@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, Calendar, Star, TrendingUp, Vote } from "lucide-react"
 import { DeleteDeviceButton } from "@/components/delete-device-button"
+import { DeleteAllVotesButton } from "@/components/delete-all-votes-button"
 import { DeleteVoteButton } from "@/components/delete-vote-button"
 import { CopyButton } from "@/components/copy-button"
 import { StarRating } from "@/components/star-rating"
@@ -89,12 +90,19 @@ export default async function DevicePage({ params }: DevicePageProps) {
                 <CopyButton textToCopy={stats.id} />
               </div>
             </div>
-            <DeleteDeviceButton 
-              deviceId={stats.id} 
-              deviceName={stats.name} 
-              voteCount={stats.votes.length} 
-              redirectAfterDelete={true}
-            />
+            <div className="flex gap-2">
+              <DeleteAllVotesButton 
+                deviceId={stats.id} 
+                deviceName={stats.name} 
+                voteCount={stats.votes.length} 
+              />
+              <DeleteDeviceButton 
+                deviceId={stats.id} 
+                deviceName={stats.name} 
+                voteCount={stats.votes.length} 
+                redirectAfterDelete={true}
+              />
+            </div>
           </div>
         </div>
 

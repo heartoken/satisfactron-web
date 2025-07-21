@@ -108,6 +108,7 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const deviceId = searchParams.get('deviceId')
     const voteId = searchParams.get('voteId')
+    const deleteAllVotes = searchParams.get('deleteAllVotes')
 
     if (voteId) {
       // Delete a specific vote
@@ -116,6 +117,13 @@ export async function DELETE(request: NextRequest) {
       `, { voteId })
 
       return NextResponse.json({ message: "Vote deleted successfully" }, { status: 200 })
+    } else if (deviceId && deleteAllVotes === 'true') {
+      // Delete all votes for a device without deleting the device
+      await client.query(`
+        delete Vote filter .device.id = <uuid>$deviceId;
+      `, { deviceId })
+
+      return NextResponse.json({ message: "All votes deleted successfully" }, { status: 200 })
     } else if (deviceId) {
       // Delete device (votes will be automatically deleted due to cascade)
       await client.query(`
