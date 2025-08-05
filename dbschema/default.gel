@@ -18,6 +18,7 @@ module default {
     votes := .<device[is Vote];
   }
 
+<<<<<<< HEAD
   # Keep existing Vote type  
   type Vote {
     required value -> int16 {
@@ -32,3 +33,19 @@ module default {
     };
   }
 }
+=======
+  type Vote {
+    required property value -> int16 {
+      constraint min_value(1);
+      constraint max_value(5);
+    };
+    required property created_at -> datetime {
+      default := datetime_current();
+    };
+    required link device -> Device {
+      on target delete delete source;
+    };
+  }
+
+}
+>>>>>>> 7e78cc218cd542e68655441702c1c1631eb40ac3
