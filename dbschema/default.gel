@@ -1,0 +1,34 @@
+module default {
+  # Add meal period configuration
+  type MealPeriod {
+    required name -> str;
+    required start_time -> cal::local_time;
+    required end_time -> cal::local_time;
+    required is_active -> bool {
+      default := true;
+    };
+    required created_at -> datetime {
+      default := datetime_current();
+    };
+  }
+
+  # Keep existing Device type
+  type Device {
+    name -> str;
+    votes := .<device[is Vote];
+  }
+
+  # Keep existing Vote type  
+  type Vote {
+    required value -> int16 {
+      constraint min_value(1);
+      constraint max_value(5);
+    };
+    required created_at -> datetime {
+      default := datetime_current();
+    };
+    required device -> Device {
+      on target delete delete source;
+    };
+  }
+}
