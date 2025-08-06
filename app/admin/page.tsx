@@ -31,7 +31,7 @@ type MealPeriod = {
 }
 
 const client = createClient({
-    instance: process.env.GEL_INSTANCE,
+    instanceName: process.env.GEL_INSTANCE,
     branch: process.env.GEL_BRANCH,
     secretKey: process.env.GEL_SECRET_KEY,
 })

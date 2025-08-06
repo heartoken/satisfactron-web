@@ -81,7 +81,7 @@ export function MealStatsCard({
                     <span className="text-sm font-semibold">
                       {meal.averageRating}
                     </span>
-                    <StarRating rating={meal.averageRating} size="xs" />
+                    <StarRating rating={meal.averageRating} size="lg" />
                   </>
                 ) : (
                   <span className="text-sm text-muted-foreground">
@@ -100,7 +100,7 @@ export function MealStatsCard({
               const bestMeal = mealStats.reduce(
                 (best, current) =>
                   current.totalVotes > 0 &&
-                  current.averageRating > best.averageRating
+                    current.averageRating > best.averageRating
                     ? current
                     : best,
                 { mealName: "", averageRating: 0, totalVotes: 0 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -18,7 +19,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 type EvolutionData = {
   date: string;
@@ -43,8 +44,39 @@ export function MealEvolutionChart({
   data,
   mealNames,
 }: MealEvolutionChartProps) {
+  // Memoize filtered data to prevent unnecessary re-renders
+  const filteredData = useMemo(() => {
+    return data.filter((day) =>
+      mealNames.some((meal) => (day[meal] as number) > 0)
+    );
+  }, [data, mealNames]);
+
+  // Memoize chart lines to prevent recreation on every render
+  const chartLines = useMemo(() => {
+    return mealNames.map((mealName, index) => (
+      <Line
+        key={`meal-line-${mealName}-${index}`} // More stable key
+        type="monotone"
+        dataKey={mealName}
+        stroke={COLORS[index % COLORS.length]}
+        strokeWidth={2}
+        dot={{
+          fill: COLORS[index % COLORS.length],
+          strokeWidth: 2,
+          r: 4,
+        }}
+        connectNulls={false}
+        isAnimationActive={false} // Disable animations to prevent DOM issues
+      />
+    ));
+  }, [mealNames]);
+
   const formatXAxisDate = (dateString: string) => {
-    return format(new Date(dateString), "dd/MM", { locale: fr });
+    try {
+      return format(new Date(dateString), "MM/dd", { locale: enUS });
+    } catch (error) {
+      return dateString;
+    }
   };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -52,12 +84,12 @@ export function MealEvolutionChart({
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
           <p className="font-medium mb-2">
-            {format(new Date(label), "dd MMMM yyyy", { locale: fr })}
+            {format(new Date(label), "MMMM dd, yyyy", { locale: enUS })}
           </p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.color }} className="text-sm">
+            <p key={`tooltip-${index}`} style={{ color: entry.color }} className="text-sm">
               {entry.dataKey}:{" "}
-              {entry.value > 0 ? `${entry.value}/5` : "Aucun avis"}
+              {entry.value > 0 ? `${entry.value}/5` : "No reviews"}
             </p>
           ))}
         </div>
@@ -66,26 +98,24 @@ export function MealEvolutionChart({
     return null;
   };
 
-  // Filter data to show only days with at least one vote
-  const filteredData = data.filter((day) =>
-    mealNames.some((meal) => (day[meal] as number) > 0)
-  );
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Évolution des notes par repas</CardTitle>
+        <CardTitle>Rating Evolution by Meal</CardTitle>
         <CardDescription>
-          Moyennes quotidiennes sur les 14 derniers jours
+          Daily averages over the last 14 days
           {filteredData.length > 0 &&
-            ` (${filteredData.length} jours avec des avis)`}
+            ` (${filteredData.length} days with reviews)`}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {filteredData.length > 0 ? (
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={filteredData}>
+              <LineChart
+                data={filteredData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
@@ -96,28 +126,14 @@ export function MealEvolutionChart({
                   domain={[0, 5]}
                   tick={{ fontSize: 12 }}
                   label={{
-                    value: "Note /5",
+                    value: "Rating /5",
                     angle: -90,
                     position: "insideLeft",
                   }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                {mealNames.map((mealName, index) => (
-                  <Line
-                    key={mealName}
-                    type="monotone"
-                    dataKey={mealName}
-                    stroke={COLORS[index % COLORS.length]}
-                    strokeWidth={2}
-                    dot={{
-                      fill: COLORS[index % COLORS.length],
-                      strokeWidth: 2,
-                      r: 4,
-                    }}
-                    connectNulls={false}
-                  />
-                ))}
+                {chartLines}
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -125,10 +141,10 @@ export function MealEvolutionChart({
           <div className="h-80 flex items-center justify-center text-center">
             <div>
               <p className="text-muted-foreground mb-2">
-                Aucune donnée d'évolution disponible
+                No evolution data available
               </p>
               <p className="text-sm text-muted-foreground">
-                Les données apparaîtront au fur et à mesure des avis reçus
+                Data will appear as reviews are received
               </p>
             </div>
           </div>
