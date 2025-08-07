@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "npm install && next build",
     "dev": " next dev --turbopack",
     "lint": "next lint",
     "start": "next start"
@@ -52,6 +52,7 @@
     "react-dom": "^19",
     "react-hook-form": "^7.54.1",
     "react-resizable-panels": "^2.1.7",
+    "react-time-picker": "^8.0.2",
     "recharts": "2.15.4",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
