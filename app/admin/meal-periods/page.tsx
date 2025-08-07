@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import { Suspense } from "react";
 import Link from "next/link";
+import TimePicker from 'react-time-picker';
+import 'react-time-picker/dist/TimePicker.css';
+import 'react-clock/dist/Clock.css';
+import './time-picker.css'
 import {
   Card,
   CardContent,
@@ -22,6 +26,8 @@ type MealPeriod = {
   end_time: string;
   is_active: boolean;
 };
+
+type TimeValue = string | null;
 
 export default function MealPeriodsAdmin() {
   const [mealPeriods, setMealPeriods] = useState<MealPeriod[]>([]);
@@ -68,7 +74,7 @@ export default function MealPeriodsAdmin() {
 
       if (response.ok) {
         setNewMeal({ name: "", startTime: "", endTime: "" });
-        await fetchMealPeriods(); // Wait for the fetch to complete
+        await fetchMealPeriods();
       } else {
         console.error("Failed to create meal period: HTTP", response.status);
       }
@@ -86,7 +92,6 @@ export default function MealPeriodsAdmin() {
       });
 
       if (response.ok) {
-        // Update state by filtering out the deleted meal
         setMealPeriods(prev => prev.filter(meal => meal.id !== mealId));
       } else {
         console.error("Failed to delete meal period: HTTP", response.status);
@@ -96,10 +101,16 @@ export default function MealPeriodsAdmin() {
     }
   };
 
+  const handleStartTimeChange = (time: TimeValue) => {
+    setNewMeal({ ...newMeal, startTime: time || '' });
+  };
+
+  const handleEndTimeChange = (time: TimeValue) => {
+    setNewMeal({ ...newMeal, endTime: time || '' });
+  };
+
   return (
     <Suspense fallback={"loading..."}>
-
-
       <div className="container mx-auto p-6">
         <div className="mb-6">
           <Link href="/admin">
@@ -141,28 +152,32 @@ export default function MealPeriodsAdmin() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="startTime">Start Time</Label>
-                  <Input
-                    id="startTime"
-                    type="time"
-                    value={newMeal.startTime}
-                    onChange={(e) =>
-                      setNewMeal({ ...newMeal, startTime: e.target.value })
-                    }
-                    required
-                  />
+                  <Label>Start Time</Label>
+                  <div className="mt-1">
+                    <TimePicker
+                      onChange={handleStartTimeChange}
+                      value={newMeal.startTime || null}
+                      disableClock={true}
+                      format="HH:mm"
+                      clockIcon={null}
+                      clearIcon={null}
+                      className="w-full"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Label htmlFor="endTime">End Time</Label>
-                  <Input
-                    id="endTime"
-                    type="time"
-                    value={newMeal.endTime}
-                    onChange={(e) =>
-                      setNewMeal({ ...newMeal, endTime: e.target.value })
-                    }
-                    required
-                  />
+                  <Label>End Time</Label>
+                  <div className="mt-1">
+                    <TimePicker
+                      onChange={handleEndTimeChange}
+                      value={newMeal.endTime || null}
+                      disableClock={true}
+                      format="HH:mm"
+                      clockIcon={null}
+                      clearIcon={null}
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               </div>
               <Button type="submit" disabled={isLoading}>
