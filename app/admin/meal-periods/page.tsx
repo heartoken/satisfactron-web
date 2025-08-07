@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import TimePicker from 'react-time-picker';
 import 'react-time-picker/dist/TimePicker.css';
-import 'react-clock/dist/Clock.css';
+// import 'react-clock/dist/Clock.css';
 import './time-picker.css'
 import {
   Card,
