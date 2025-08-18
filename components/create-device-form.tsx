@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
 import { useRouter } from 'next/navigation'
-
+import { Suspense } from 'react'
 export function CreateDeviceForm() {
   const [deviceName, setDeviceName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -45,44 +45,48 @@ export function CreateDeviceForm() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Créer un appareil
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Créer un nouvel appareil</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Input
-              placeholder="Nom de l'appareil"
-              value={deviceName}
-              onChange={(e) => setDeviceName(e.target.value)}
-              disabled={isLoading}
-            />
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => setOpen(false)}
-              disabled={isLoading}
-            >
-              Annuler
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={isLoading || !deviceName.trim()}
-            >
-              {isLoading ? 'Création...' : 'Créer l\'appareil'}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <Suspense fallback="loading...">
+
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Créer un appareil
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Créer un nouvel appareil</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Input
+                placeholder="Nom de l'appareil"
+                value={deviceName}
+                onChange={(e) => setDeviceName(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={isLoading}
+              >
+                Annuler
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading || !deviceName.trim()}
+              >
+                {isLoading ? 'Création...' : 'Créer l\'appareil'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </Suspense>
   )
 }

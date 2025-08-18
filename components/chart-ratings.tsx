@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Star } from "lucide-react"
-
 import {
   Card,
   CardContent,
@@ -75,22 +74,116 @@ const chartConfig = {
 
 export function ChartRatings({ votes }: ChartRatingsProps) {
   const [timeRange, setTimeRange] = React.useState("7d")
-  
-  const chartData = React.useMemo(() => processVotesData(votes), [votes])
+  const [isLoading, setIsLoading] = React.useState(true)
 
-  const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date)
-    const now = new Date()
-    let daysToSubtract = 7
-    if (timeRange === "30d") {
-      daysToSubtract = 30
-    } else if (timeRange === "90d") {
-      daysToSubtract = 90
+  // Simplified mounting logic
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  const chartData = React.useMemo(() => {
+    if (!votes?.length) return []
+    try {
+      return processVotesData(votes)
+    } catch (error) {
+      console.error('Error processing votes data:', error)
+      return []
     }
-    const startDate = new Date(now)
-    startDate.setDate(startDate.getDate() - daysToSubtract)
-    return date >= startDate
-  })
+  }, [votes])
+
+  const filteredData = React.useMemo(() => {
+    if (!chartData.length) return []
+
+    try {
+      return chartData.filter((item) => {
+        const date = new Date(item.date)
+        const now = new Date()
+        let daysToSubtract = 7
+        if (timeRange === "30d") {
+          daysToSubtract = 30
+        } else if (timeRange === "90d") {
+          daysToSubtract = 90
+        }
+        const startDate = new Date(now)
+        startDate.setDate(startDate.getDate() - daysToSubtract)
+        return date >= startDate
+      })
+    } catch (error) {
+      console.error('Error filtering chart data:', error)
+      return []
+    }
+  }, [chartData, timeRange])
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <Card className="pt-0">
+        <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+          <div className="grid flex-1 gap-1">
+            <CardTitle>Évolution des notes</CardTitle>
+            <CardDescription>
+              Moyenne des évaluations clients dans le temps
+            </CardDescription>
+          </div>
+          <div className="w-[160px] h-10 bg-muted rounded-lg animate-pulse hidden sm:block" />
+        </CardHeader>
+        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          <div className="aspect-auto h-[250px] w-full flex items-center justify-center bg-muted/20 rounded-lg">
+            <div className="text-muted-foreground">Chargement du graphique...</div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // No data state
+  if (!filteredData.length) {
+    return (
+      <Card className="pt-0">
+        <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+          <div className="grid flex-1 gap-1">
+            <CardTitle>Évolution des notes</CardTitle>
+            <CardDescription>
+              Moyenne des évaluations clients dans le temps
+            </CardDescription>
+          </div>
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger
+              className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
+              aria-label="Select a value"
+            >
+              <SelectValue placeholder="7 derniers jours" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="7d" className="rounded-lg">
+                7 derniers jours
+              </SelectItem>
+              <SelectItem value="30d" className="rounded-lg">
+                Dernier mois
+              </SelectItem>
+              <SelectItem value="90d" className="rounded-lg">
+                3 derniers mois
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </CardHeader>
+        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          <div className="aspect-auto h-[250px] w-full flex items-center justify-center">
+            <div className="text-center space-y-2">
+              <p className="text-muted-foreground">Aucune donnée disponible</p>
+              <p className="text-sm text-muted-foreground">
+                pour la période sélectionnée
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="pt-0">
@@ -149,11 +242,15 @@ export function ChartRatings({ votes }: ChartRatingsProps) {
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
-                const date = new Date(value)
-                return date.toLocaleDateString("fr-FR", {
-                  month: "short",
-                  day: "numeric",
-                })
+                try {
+                  const date = new Date(value)
+                  return date.toLocaleDateString("fr-FR", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                } catch (error) {
+                  return value
+                }
               }}
             />
             <YAxis
@@ -168,47 +265,55 @@ export function ChartRatings({ votes }: ChartRatingsProps) {
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("fr-FR", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })
+                    try {
+                      return new Date(value).toLocaleDateString("fr-FR", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    } catch (error) {
+                      return value
+                    }
                   }}
                   formatter={(value, _name, item) => {
-                    const data = item.payload as RatingData
-                    return (
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">Note moyenne:</span>
-                          <span>{Number(value).toFixed(1)}/5</span>
-                        </div>
-                        <div className="space-y-1">
-                          {[5, 4, 3, 2, 1].map((rating) => {
-                            const count = data.ratings[rating] || 0
-                            return (
-                              <div key={rating} className="flex items-center justify-between gap-2">
-                                <div className="flex">
-                                  {Array.from({ length: 5 }).map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      className="w-3 h-3"
-                                      fill={i < rating ? "#f59e0b" : "none"}
-                                      color={i < rating ? "#f59e0b" : "#d1d5db"}
-                                      strokeWidth={2}
-                                    />
-                                  ))}
+                    try {
+                      const data = item.payload as RatingData
+                      return (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold">Note moyenne:</span>
+                            <span>{Number(value).toFixed(1)}/5</span>
+                          </div>
+                          <div className="space-y-1">
+                            {[5, 4, 3, 2, 1].map((rating) => {
+                              const count = data.ratings[rating] || 0
+                              return (
+                                <div key={rating} className="flex items-center justify-between gap-2">
+                                  <div className="flex">
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className="w-3 h-3"
+                                        fill={i < rating ? "#f59e0b" : "none"}
+                                        color={i < rating ? "#f59e0b" : "#d1d5db"}
+                                        strokeWidth={2}
+                                      />
+                                    ))}
+                                  </div>
+                                  <span className="text-sm text-muted-foreground">{count}</span>
                                 </div>
-                                <span className="text-sm text-muted-foreground">{count}</span>
-                              </div>
-                            )
-                          })}
+                              )
+                            })}
+                          </div>
+                          <div className="text-sm text-muted-foreground pt-1">
+                            Total: {data.count} vote{data.count > 1 ? 's' : ''}
+                          </div>
                         </div>
-                        <div className="text-sm text-muted-foreground pt-1">
-                          Total: {data.count} vote{data.count > 1 ? 's' : ''}
-                        </div>
-                      </div>
-                    )
+                      )
+                    } catch (error) {
+                      return <div>Erreur d'affichage des données</div>
+                    }
                   }}
                 />
               }
