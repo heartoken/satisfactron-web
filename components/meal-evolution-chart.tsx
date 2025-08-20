@@ -192,7 +192,7 @@ export function MealEvolutionChart({
                   tick={{ fontSize: 12 }}
                 />
                 <YAxis
-                  domain={[0, 5]}
+                  domain={[1, 5]}
                   tick={{ fontSize: 12 }}
                   label={{
                     value: "Rating /5",

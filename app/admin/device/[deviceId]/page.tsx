@@ -224,8 +224,8 @@ function getDailyMealEvolution(
       const average =
         count > 0
           ? votesForDay.reduce((sum, vote) => sum + vote.value, 0) / count
-          : 0;
-      dayData[meal.name] = Math.round(average * 100) / 100;
+          : null; // Use null instead of 0 when no votes
+      dayData[meal.name] = count > 0 ? Math.round(average * 100) / 100 : null;
       dayData[`${meal.name}_count`] = count; // Add vote count
     });
 
