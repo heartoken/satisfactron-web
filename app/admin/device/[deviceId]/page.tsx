@@ -30,6 +30,7 @@ import { MealEvolutionChart } from "@/components/meal-evolution-chart";
 import { RatingsSummary } from "@/components/ratings-summary";
 import { MealsTabContent } from "@/components/meals-tab-content";
 import { HistoryTabContent } from "@/components/history-tab-content";
+import { DailyVsAllTimeStats } from "@/components/daily-vs-alltime-stats";
 
 interface DevicePageProps {
   params: Promise<{
@@ -260,6 +261,7 @@ function DevicePageTabs({
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           <div className="space-y-6">
+            <DailyVsAllTimeStats votes={stats.votes} mealPeriods={serializedMealPeriods} />
             <ChartRatings votes={stats.votes} />
             <RatingsSummary votes={stats.votes} />
           </div>
