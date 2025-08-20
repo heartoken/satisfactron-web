@@ -13,6 +13,7 @@ import { DynamicTimeAgo } from "@/components/dynamic-time-ago"
 import { ChartRatings } from "@/components/chart-ratings"
 import { MealEvolutionChart } from "@/components/meal-evolution-chart"
 import { DailyVsAllTimeStats } from "@/components/daily-vs-alltime-stats"
+import { MealsTabContent } from "@/components/meals-tab-content"
 
 interface DevicePageProps {
   params: Promise<{
@@ -208,10 +209,12 @@ function getDailyMealEvolution(votes: Vote[], mealPeriods: MealPeriod[], days: n
 
     mealPeriods.forEach(meal => {
       const votesForDay = dailyStats[dateKey]?.[meal.id] || [];
-      const average = votesForDay.length > 0
-        ? votesForDay.reduce((sum, vote) => sum + vote.value, 0) / votesForDay.length
+      const count = votesForDay.length;
+      const average = count > 0
+        ? votesForDay.reduce((sum, vote) => sum + vote.value, 0) / count
         : 0;
       dayData[meal.name] = Math.round(average * 100) / 100;
+      dayData[`${meal.name}_count`] = count; // Add vote count
     });
 
     result.push(dayData);
@@ -435,90 +438,13 @@ export default async function DevicePage({ params }: DevicePageProps) {
 
             {/* Enhanced Meals Tab */}
             <TabsContent value="meals" className="space-y-8 mt-8">
-              {mealPeriods.length > 0 ? (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {mealStats.map((meal) => (
-                    <Card
-                      key={meal.id}
-                      className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-white/20 shadow-lg hover:shadow-xl transition-all duration-200"
-                    >
-                      <CardHeader className="pb-4">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-xl flex items-center">
-                            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
-                              <Utensils className="w-4 h-4 text-white" />
-                            </div>
-                            {meal.name}
-                          </CardTitle>
-                          <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-700">
-                            <Vote className="w-3 h-3 mr-1" />
-                            {meal.totalVotes}
-                          </Badge>
-                        </div>
-                        <CardDescription className="flex items-center gap-2 text-base">
-                          <Clock className="w-4 h-4" />
-                          {meal.timeRange}
-                        </CardDescription>
-                      </CardHeader>
-
-                      <CardContent className="space-y-6">
-                        {meal.totalVotes > 0 ? (
-                          <>
-                            {/* Average Rating */}
-                            <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
-                              <div className="flex items-center justify-between">
-                                <div className="space-y-2">
-                                  <div className="flex items-center space-x-3">
-                                    <span className="text-3xl font-bold text-amber-600 dark:text-amber-400">{meal.averageRating}</span>
-                                    <span className="text-muted-foreground">out of 5</span>
-                                  </div>
-                                  <StarRating rating={meal.averageRating} size="sm" />
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Distribution */}
-                            <div className="space-y-3">
-                              <p className="font-medium text-muted-foreground">Distribution</p>
-                              {[5, 4, 3, 2, 1].map((rating) => {
-                                const count = meal.distribution[rating];
-                                const percentage = meal.totalVotes > 0 ? (count / meal.totalVotes) * 100 : 0;
-
-                                return (
-                                  <div key={rating} className="flex items-center gap-3 text-sm">
-                                    <span className="w-6 font-medium">{rating}★</span>
-                                    <Progress value={percentage} className="h-2 flex-grow bg-slate-100 dark:bg-slate-700" />
-                                    <span className="w-8 text-muted-foreground font-medium">{count}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </>
-                        ) : (
-                          <div className="text-center py-8">
-                            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
-                              <Utensils className="w-8 h-8 text-muted-foreground" />
-                            </div>
-                            <p className="text-muted-foreground">No reviews for this meal yet</p>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <Card className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-white/20 shadow-lg">
-                  <CardContent className="pt-12 pb-12">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Utensils className="w-10 h-10 text-muted-foreground" />
-                      </div>
-                      <h3 className="text-xl font-semibold mb-2">No meal periods configured</h3>
-                      <p className="text-muted-foreground">Meal-based analytics will be available once periods are configured.</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-lg">
+                <MealsTabContent
+                  mealPeriods={mealPeriods}
+                  mealStats={mealStats}
+                  votes={stats.votes}
+                />
+              </div>
             </TabsContent>
 
             {/* Evolution Tab */}

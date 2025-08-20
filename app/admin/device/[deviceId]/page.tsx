@@ -220,12 +220,13 @@ function getDailyMealEvolution(
 
     mealPeriods.forEach((meal) => {
       const votesForDay = dailyStats[dateKey]?.[meal.id] || [];
+      const count = votesForDay.length;
       const average =
-        votesForDay.length > 0
-          ? votesForDay.reduce((sum, vote) => sum + vote.value, 0) /
-          votesForDay.length
+        count > 0
+          ? votesForDay.reduce((sum, vote) => sum + vote.value, 0) / count
           : 0;
       dayData[meal.name] = Math.round(average * 100) / 100;
+      dayData[`${meal.name}_count`] = count; // Add vote count
     });
 
     result.push(dayData);
@@ -269,6 +270,7 @@ function DevicePageTabs({
           <MealsTabContent
             mealPeriods={serializedMealPeriods}
             mealStats={mealStats}
+            votes={stats.votes}
           />
         </TabsContent>
 
