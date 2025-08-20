@@ -27,8 +27,9 @@ type DailyVsAllTimeProps = {
 
 function getMealPeriodForVote(vote: Vote, mealPeriods: MealPeriod[]): MealPeriod | null {
     try {
+        // Extract UTC time for comparison
         const voteDate = new Date(vote.created_at);
-        const voteMinutes = voteDate.getHours() * 60 + voteDate.getMinutes();
+        const voteMinutes = voteDate.getUTCHours() * 60 + voteDate.getUTCMinutes();
 
         return mealPeriods.find(meal => {
             if (!meal.is_active) return false;

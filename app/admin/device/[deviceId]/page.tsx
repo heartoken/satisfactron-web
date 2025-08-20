@@ -120,7 +120,11 @@ function getMealPeriodForVote(
   vote: Vote,
   mealPeriods: any[]
 ): any | null {
-  const voteTime = new Date(vote.created_at).toTimeString().slice(0, 5);
+  // Extract UTC time as HH:MM format for comparison
+  const voteDate = new Date(vote.created_at);
+  const utcHours = voteDate.getUTCHours().toString().padStart(2, '0');
+  const utcMinutes = voteDate.getUTCMinutes().toString().padStart(2, '0');
+  const voteTime = `${utcHours}:${utcMinutes}`;
 
   return (
     mealPeriods.find((meal) => {
