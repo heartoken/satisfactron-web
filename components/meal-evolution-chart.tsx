@@ -30,7 +30,7 @@ import { enUS } from "date-fns/locale";
 
 type EvolutionData = {
   date: string;
-  [mealName: string]: number | string;
+  [mealName: string]: number | string | undefined;
   [key: `${string}_count`]: number; // Add vote count support
 };
 

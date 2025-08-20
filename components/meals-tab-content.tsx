@@ -202,8 +202,8 @@ export function MealsTabContent({ mealPeriods, mealStats, votes = [] }: MealsTab
             </div>
             
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredMealStats.map((meal) => (
-                <Card key={meal.id} className="relative">
+            {filteredMealStats.map((meal, index) => (
+                <Card key={meal.id || `meal-${index}`} className="relative">
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-lg flex items-center">
@@ -248,7 +248,7 @@ export function MealsTabContent({ mealPeriods, mealStats, votes = [] }: MealsTab
 
                                         return (
                                             <div
-                                                key={rating}
+                                                key={`meal-${meal.id || 'unknown'}-rating-${rating}`}
                                                 className="flex items-center gap-2 text-xs"
                                             >
                                                 <span className="w-4">{rating}★</span>

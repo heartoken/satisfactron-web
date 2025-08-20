@@ -196,7 +196,7 @@ export default async function Dashboard() {
   ]);
 
   const currentTime = new Date();
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const currentMinutes = currentTime.getUTCHours() * 60 + currentTime.getUTCMinutes();
 
   const currentMeal = mealPeriods.find((meal) => {
     const [startHour, startMin] = meal.start_time.split(':').map(Number);

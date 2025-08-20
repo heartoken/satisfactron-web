@@ -4,7 +4,7 @@ import { createClient } from "gel";
 const client = createClient();
 
 async function getMealPeriodForTimestamp(timestamp: string) {
-  // Extract UTC time as HH:MM format for comparison
+  // Extract UTC time as HH:MM format for comparison with UTC meal periods
   const date = new Date(timestamp);
   const utcHours = date.getUTCHours().toString().padStart(2, '0');
   const utcMinutes = date.getUTCMinutes().toString().padStart(2, '0');
