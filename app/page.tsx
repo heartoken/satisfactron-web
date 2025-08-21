@@ -13,6 +13,7 @@ import { StarRating } from "@/components/star-rating";
 import { MealStatsCard } from "@/components/meal-stats-card";
 import { MealFilter } from "@/components/meal-filter";
 import { DailyVsAllTimeStats } from "@/components/daily-vs-alltime-stats"
+import { ConfiguredMealPeriods } from "@/components/configured-meal-periods"
 
 import { createClient } from "gel";
 
@@ -43,24 +44,6 @@ const client = createClient({
   branch: process.env.GEL_BRANCH,
   secretKey: process.env.GEL_SECRET_KEY,
 });
-
-// Helper function to convert UTC time to local time for display
-function convertUTCTimeToLocal(utcTime: string): string {
-  if (!utcTime) return '';
-  
-  const today = new Date().toISOString().split('T')[0];
-  // Handle both HH:MM and HH:MM:SS formats
-  const timeWithSeconds = utcTime.length === 5 ? `${utcTime}:00` : utcTime;
-  const utcDateTime = `${today}T${timeWithSeconds}Z`;
-  
-  // Create UTC date, then format in local timezone
-  const utcDate = new Date(utcDateTime);
-  return utcDate.toLocaleTimeString('en-GB', { 
-    hour: '2-digit', 
-    minute: '2-digit',
-    hour12: false 
-  });
-}
 
 // Updated toHHMM function to handle time objects
 function toHHMM(timeObj: any): string {
@@ -261,39 +244,10 @@ export default async function Dashboard() {
       </div>
 
       {/* Add meal periods summary */}
-      {mealPeriods.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">
-              Configured Meal Periods
-            </CardTitle>
-            <CardDescription>
-              Active schedules for feedback analysis
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4">
-              {mealPeriods.map((meal) => (
-                <div
-                  key={meal.id}
-                  className={`p-3 rounded-lg border ${currentMeal?.id === meal.id
-                    ? "bg-emerald-50 border-emerald-200"
-                    : "bg-muted/50"
-                    }`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <Utensils className="w-4 h-4 text-muted-foreground" />
-                    <span className="font-medium">{meal.name}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {convertUTCTimeToLocal(meal.start_time)} - {convertUTCTimeToLocal(meal.end_time)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <ConfiguredMealPeriods 
+        mealPeriods={mealPeriods} 
+        currentMeal={currentMeal} 
+      />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {devicesStats.map((device: Device) => {
